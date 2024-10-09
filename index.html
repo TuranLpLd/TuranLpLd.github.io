@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-Cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #main-window {
+            margin: 0;
+            padding: 0;
+            width: 360px;
+            height: 420px;
+            box-sizing: border-box;
+            border: 10px black solid;
+            background-color: #b7d4a8;
+            border-radius: 5%;
+            font-size: 20px;
+            font-weight: bold;
+            font-family: cursive;
+            margin: 0 auto;
+        }
+        #inner-window {
+            margin: 0;
+            padding: 0;
+            width: 304px;
+            height: 304px;
+            border: 2px black solid;
+            margin: 0 auto;
+            margin-top: 20px;
+            position: relative;
+            text-align: center;
+            font-size: 50px;
+            line-height: 304px;
+        }
+        .container {
+            width: 304px;
+            margin: 0 auto;
+        }
+        .left-fix {
+            float: left;
+        }
+        .right-fix {
+            float: right;
+        }
+        .clearfix::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+        #mes {
+            margin-top: 30px;
+        }
+        #food {
+            width: 10px;
+            height: 10px;
+            background-color: #000;
+            position: absolute;
+            transform: rotate(45deg);
+            top: 100px;
+            left: 150px;
+        }
+        #snack div {
+            width: 9px;
+            height: 9px;
+            margin: 1px;
+            border-radius: 50%;
+            background-color: #000;
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+    <div id="main-window">
+        <div class="container">
+            <div id="inner-window">
+                <div id="food"></div>
+                <div id="snack">
+                    <div id="s-head" class="right" style="left: 50px; top: 50px;"></div>
+                    
+                </div>
+            </div>
+            <div id="mes" class="clearfix">
+                <div class="left-fix">
+                    SCORE:<span id="score">100</span>
+                </div>
+                <div class="right-fix">
+                    LEVEL:<span id="level">1</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let interval = 120;
+        const content = document.getElementById("inner-window");
+        const snack = document.getElementById("snack");
+        const sHead = snack.firstElementChild;
+        console.log(sHead);
+        const sBody = snack.children;
+        const food = document.getElementById("food");
+        food.style.top = "100px";
+        food.style.left = "150px";
+
+        const score = document.getElementById("score");
+        const level = document.getElementById("level");
+        let scNum = 0;
+        let leNum = 1;
+        score.innerText = scNum + "";
+        level.innerText = leNum + "";
+        let cnt = 0;
+
+        const mainGameId = setInterval(() => {
+            
+            let oldLast = snack.lastElementChild;
+            let oldTop = oldLast.style.top;
+            let oldLeft = oldLast.style.left;
+            let firstTop = sHead.style.top;
+            let firstLeft = sHead.style.left;
+            if(sHead.classList.contains("down")) {
+                let top = parseInt(sHead.style.top);
+                if(isNaN(top)) {
+                    top = 0;
+                }
+                top += 10;
+                sHead.style.top = top + "px";
+            } else if(sHead.classList.contains("up")) {
+                let top = parseInt(sHead.style.top);
+                if(isNaN(top)) {
+                    top = 0;
+                }
+                top -= 10;
+                sHead.style.top = top + "px";
+            } else if(sHead.classList.contains("left")) {
+                let left = parseInt(sHead.style.left);
+                if(isNaN(left)) {
+                    left = 0;
+                }
+                left -= 10;
+                sHead.style.left = left + "px";
+            } else if(sHead.classList.contains("right")) {
+                let left = parseInt(sHead.style.left);
+                if(isNaN(left)) {
+                    left = 0;
+                }
+                left += 10;
+                sHead.style.left = left + "px";
+            }
+            
+            
+            for(let i = 1; i < sBody.length; i++) {
+                item = sBody[i];
+                if(item.style.top == sHead.style.top && item.style.left == sHead.style.left){
+                    content.innerText = "菜";
+                    clearInterval(mainGameId);
+                    setTimeout(() => {
+                    history.go(0);
+                }, 3000);
+                    return;
+                }
+            }
+            if(parseInt(sHead.style.top) > 300 || parseInt(sHead.style.top) < 0 ||
+            parseInt(sHead.style.left) > 300 || parseInt(sHead.style.left) < 0) {
+                content.innerText = "菜";
+                clearInterval(mainGameId);
+                setTimeout(() => {
+                    history.go(0);
+                }, 3000);
+                return;
+            }
+            
+
+            let tempTop;
+            let tempLeft;
+
+            for(let i = 1; i < sBody.length; i++) {
+                tempTop = firstTop;
+                tempLeft = firstLeft;
+                firstTop = sBody[i].style.top;
+                firstLeft = sBody[i].style.left;
+                sBody[i].style.top = tempTop;
+                sBody[i].style.left = tempLeft;
+            }
+
+            if(sHead.style.top == food.style.top &&
+                sHead.style.left == food.style.left
+            ) {
+                snack.insertAdjacentHTML("beforeend", "<div></div>")
+                let last = snack.lastElementChild;
+                last.style.top = oldTop;
+                last.style.left = oldLeft;
+
+                food.style.top = Math.floor(Math.random()*30)*10 + "px";
+                food.style.left = Math.floor(Math.random()*30)*10 + "px";
+
+                scNum += 100;
+                score.innerText = scNum + "";
+
+                cnt += 1;
+                if(cnt == 10 && interval > 40) {
+                    cnt = 0;
+                    leNum += 1
+                    level.innerText = leNum + "";
+                    interval -= 10;
+                }
+            }
+
+            
+
+        }, interval);
+
+        document.addEventListener("keydown", (event) => {
+            let cName = sHead.className;
+            console.log(cName);
+            switch(event.key) {
+                case "ArrowUp":
+                case "w":
+                case "W":
+                if(cName != "down") {
+                    sHead.classList.remove(cName);
+                    sHead.classList.add("up");
+                }
+                break;
+
+                case "ArrowRight":
+                case "d":
+                case "D":
+                if(cName != "left") {
+                    sHead.classList.remove(cName);
+                    sHead.classList.add("right");
+                }
+                break;
+
+                case "ArrowDown":
+                case "s":
+                case "S":
+                if(cName != "up") {
+                    sHead.classList.remove(cName);
+                    sHead.classList.add("down");
+                }
+                break;
+
+                case "ArrowLeft":
+                case "a":
+                case "A":
+                if(cName != "right") {
+                    sHead.classList.remove(cName);
+                    sHead.classList.add("left");
+                }
+                
+                break;
+            }
+        });
+
+        
+        
+    </script>
+</body>
+</html>
