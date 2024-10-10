@@ -109,7 +109,8 @@
         level.innerText = leNum + "";
         let cnt = 0;
 
-        const mainGameId = setInterval(() => {
+        function gameloop() {
+            () => {
             
             let oldLast = snack.lastElementChild;
             let oldTop = oldLast.style.top;
@@ -201,12 +202,17 @@
                     leNum += 1
                     level.innerText = leNum + "";
                     interval -= 10;
+                    clearIterval(mainGameId);
+                    setInterval(gameloop, interval)
                 }
             }
 
             
 
-        }, interval);
+        }
+        }
+            
+        let mainGameId = setInterval(gameloop, interval);
 
         document.addEventListener("keydown", (event) => {
             let cName = sHead.className;
